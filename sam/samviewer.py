@@ -920,6 +920,10 @@ def get_class_names(system_hive: Path) -> dict[str, str]:
         'data': lsa.subkey('Data')._nkrecord.classname()
     }
 
+def plain_text(input_text):
+    #   Removes ANSI color codes from text
+    return input_text.replace('\033[1m', '').replace('\033[0m', '')
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Decrypt NT/LM password hashes using boot key components.')
 
@@ -933,6 +937,7 @@ if __name__ == '__main__':
     parser.add_argument('--gbg', help='GBG class name (4 bytes)')
     parser.add_argument('--data', help='Data key class name (4 bytes)')
     parser.add_argument('--pw', help='Custom password to hash & encrypt for every user found')
+    parser.add_argument('--output', help='Path to output file')
 
     args = parser.parse_args()
 
@@ -944,4 +949,7 @@ if __name__ == '__main__':
     else:
         raise ValueError('Either --reg or --hive must be provided.')
 
+    with open(args.output, 'w', encoding='utf-8') as f:
+        f.write(plain_text(str(domain)))
+    
     print(domain)
